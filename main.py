@@ -1,6 +1,9 @@
-import start
+import game_logic
 
-start.step_one() #alkunäyttö
+################## VAIHEET ####################
 
-vaikeusaste = start.step_two() #vaikeusaste
+game_logic.step_one() # alkunäyttö
+maa_arvattu = game_logic.step_two() # maan arvaus
+game_logic.step_three()
 
+###############################################
