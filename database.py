@@ -3,11 +3,11 @@ def connection():
 
 # funktio joka valitse random maan joka eurossa ja palauttaa sen returnilla
 def maa_random():
-testi2
+testi3
 # funktio joka valitsee random kaupungin maasta ja palauttaa sen returnilla
 def kaupunki_random():
 
-# funktio joka valitseee random lentoaseman kaupungista, huom! jos lentoasema on yli 5
+# funktio joka valitsee random lentoaseman kaupungista, huom! jos lentoasema on yli 5
 def lentoasema_random():
 
 # funktio joka hakee lentoaseman koordinaatit, muuttaa niitä vähintään 100m erisuuntiin ja palauttaa ne returnilla (gps muodossa)
