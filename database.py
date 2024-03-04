@@ -3,7 +3,7 @@ def connection():
 
 # funktio joka valitse random maan joka eurossa ja palauttaa sen returnilla
 def maa_random():
-
+testi2
 # funktio joka valitsee random kaupungin maasta ja palauttaa sen returnilla
 def kaupunki_random():
 
