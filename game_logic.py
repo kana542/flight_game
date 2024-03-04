@@ -14,9 +14,12 @@ koordinaatit = database.lentoasema_koordinaatit() # tallennetaan lentoaseman koo
 kohteen_tyyppi = database.lentoasema_tyyppi() # tallennetaan kohteen tyyppi (lentoasema vai heliport) muuttujaan
 kohteen_koko = database.lentoasema_koko() # jos kyseessä lentoasema niin tallennetaan kohteen koko muuttujaan
 
-################## VAIHEET #####################
+maa_arvattu = False
 
-# Step 1. Alkunäyttö missä kerrotaan pelaajalle mistä on kyse
+
+################## STEP ONE ####################
+# ALKUNÄYTTÖ MISSÄ SELITETÄÄN PELAAJALLE HOMMAN NIMI
+
 def step_one():
     time.sleep(2)
 
@@ -51,18 +54,22 @@ def step_one():
     os.system("cls")
 
 
-# Step 2. Silmukka kysely kunnes käyttäjä saa oikean vastauksen (oikea maan nimi)
+################## STEP TWO ####################
+# * TUOTETAAN PELAAJALLE 3KPL AVAINSANOJA OPENAI APIN AVULLA
+# * JOS PELAAJA ARVAA OIKEIN, LOOPPI MENEE BROKIE JA PELI JATKUU SEURAAVAAN VAIHEESEEN
+
 def step_two(oikea_maa):
     print(f"Arvaa oikea maa seuraavista vihjeistä: {tuota_avainsanat(oikea_maa)}")
     while True:
         maa_arvaus = input("Vastaus: ")
         if maa_arvaus == oikea_maa:
             print("Oikein!")
+            maa_arvattu = True
             break
-    return True
 
-
-# Step 3. Annetaan uudet vihjeet käyttäjälle
+################## STEP THREE ####################
+# ANNETAAN PELAAJALLE VIIMEISET VIHJEET ELI KOHTEEN TYYPPI (LENTOASEMA TAI HELIPORT), KOKO JA KOORDINAATIT JOTKA HIEMAN HUMALASSA
+        
 def step_three():
     print("Noniin, siirrytään seuraavaan vaiheeseen!\nSeuraavaksi sinun pitää etsiä selaimella kartasta oikea lentoasema!")
     print(f"Millainen kohde on kyseessä?: {kohteen_tyyppi}")
@@ -71,6 +78,11 @@ def step_three():
   
     print(f"GPS-koordinaatit lähialueelta: {koordinaatit}")
 
+################## STEP FOUR ####################
+
+def step_four():
+    while True:
+    
 
 ################ MUUT PASKAT ######################
 
@@ -81,6 +93,21 @@ def tuota_avainsanat(maa):
     completion = client.chat.completions.create(
         model = "gpt-4-0125-preview",
         messages = [{"role": "system", "content": f"Anna suomenkielellä 3 avainsanaa maasta: {maa}. Älä anna maan nimeä suoraan. Anna vastaukset samalla rivillä ja erottele ne pilkulla, älä lisää mitään muuta vastaukseen."}]
+    )
+
+    temp_avainsanat = completion.choices[0].message.content.strip()
+    #muutetaan saadut avainsanat listaksi
+    avainsanat = [avainsana.strip() for avainsana in temp_avainsanat.split(",")]
+
+    return avainsanat
+
+# funktio joka tarkistaa onko satunnaisesti tuotettu lentoasema google mapsissa 
+def tarkista_lentoasema():
+    client = OpenAI(api_key = "XXXXXXXXXXXXXXXXXXXX")
+    
+    completion = client.chat.completions.create(
+        model = "gpt-4-0125-preview",
+        messages = [{"role": "system", "content": f"Tarkista seuraava lentoasema/helikopterialusta, löytyykö se google mapsista. Vastaa vain 1 jos löytyy ja 0 jos ei löydy."}]
     )
 
     temp_avainsanat = completion.choices[0].message.content.strip()

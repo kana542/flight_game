@@ -7,10 +7,10 @@ def maa_random():
 # funktio joka valitsee random kaupungin maasta ja palauttaa sen returnilla
 def kaupunki_random():
 
-# funktio joka valitseee random lentoaseman kaupungista
+# funktio joka valitseee random lentoaseman kaupungista, huom! jos lentoasema on yli 5
 def lentoasema_random():
 
-# funktio joka hakee lentoaseman koordinaatit ja palauttaa ne returnilla (gps muodossa)
+# funktio joka hakee lentoaseman koordinaatit, muuttaa niitä vähintään 100m erisuuntiin ja palauttaa ne returnilla (gps muodossa)
 def lentoasema_koordinaatit():
 
 # funktio joka palauttaa kohteen tyypin (lentoasema tai heliport)
