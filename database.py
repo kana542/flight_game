@@ -1,11 +1,29 @@
 # funktio joka yhdistää sql-tietokantaan.
+import mysql.connector
 def connection():
+    def hae(sql):
+        kursori = yhteys.cursor()
+        kursori.execute(sql)
+        tulos = kursori.fetchall()
+        return tulos
 
+    yhteys = mysql.connector.connect(
+        host='127.0.0.1',
+        port=3306,
+        database='flight_game',
+        user='root',
+        password='root',
+        autocommit=True
+    )
 # funktio joka valitse random maan joka eurossa ja palauttaa sen returnilla
 def maa_random():
-testi3
+    maa = "select name from country where continent = 'EU' order by name;"
+    return
+
 # funktio joka valitsee random kaupungin maasta ja palauttaa sen returnilla
 def kaupunki_random():
+    kaupunki = "select municipality from airport;"
+    return
 
 # funktio joka valitsee random lentoaseman kaupungista, huom! jos lentoasema on yli 5
 def lentoasema_random():
