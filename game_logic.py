@@ -16,7 +16,6 @@ kohteen_koko = database.lentoasema_koko() # jos kyseessä lentoasema niin tallen
 
 maa_arvattu = False
 
-
 ################## STEP ONE ####################
 # ALKUNÄYTTÖ MISSÄ SELITETÄÄN PELAAJALLE HOMMAN NIMI
 
@@ -82,7 +81,15 @@ def step_three():
 
 def step_four():
     while True:
-    
+        if tarkista_lentoasema(oikea_lentoasema) != "ok":
+            oikea_lentoasema = database.lentoasema_random()
+        else:
+            while True:
+                lentoasema_arvaus = input("Anna vihdoin oikea lentoasema: ")
+                if lentoasema_arvaus == oikea_lentoasema:
+                    print("Oikein! Voitit pelin!")
+                    break
+        break
 
 ################ MUUT PASKAT ######################
 
@@ -102,16 +109,16 @@ def tuota_avainsanat(maa):
     return avainsanat
 
 # funktio joka tarkistaa onko satunnaisesti tuotettu lentoasema google mapsissa 
-def tarkista_lentoasema():
+def tarkista_lentoasema(lentoasema):
     client = OpenAI(api_key = "XXXXXXXXXXXXXXXXXXXX")
     
     completion = client.chat.completions.create(
         model = "gpt-4-0125-preview",
-        messages = [{"role": "system", "content": f"Tarkista seuraava lentoasema/helikopterialusta, löytyykö se google mapsista. Vastaa vain 1 jos löytyy ja 0 jos ei löydy."}]
+        messages = [{"role": "system", "content": f"Tarkista seuraava lentoasema/helikopterialusta: {lentoasema}, löytyykö se google mapsista. Vastaa vain ok jos löytyy ja ei jos ei löydy."}]
     )
 
     temp_avainsanat = completion.choices[0].message.content.strip()
     #muutetaan saadut avainsanat listaksi
-    avainsanat = [avainsana.strip() for avainsana in temp_avainsanat.split(",")]
+    vastaus = [avainsana.strip() for avainsana in temp_avainsanat.split(",")]
 
-    return avainsanat
+    return vastaus
