@@ -30,9 +30,11 @@ def lentoasema_random():
 
 # funktio joka hakee lentoaseman koordinaatit, muuttaa niitä vähintään 100m erisuuntiin ja palauttaa ne returnilla (gps muodossa)
 def lentoasema_koordinaatit():
+    lentoasema_koordinaatti = "SELECT latitude_deg, longitude_deg FROM airport LIMIT 1;"
+    return
 
 # funktio joka palauttaa kohteen tyypin (lentoasema tai heliport)
 def lentoasema_tyyppi():
-
+    lento_tai_heli = "SELECT type FROM airport;"
 # funktio joka palauttaa lentoaseman koon, jos kyseessä on heliport, eli kokoa ei ole niin palautetaan False.
 def lentoasema_koko():
