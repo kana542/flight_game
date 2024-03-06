@@ -17,12 +17,12 @@ def connection():
     )
 # funktio joka valitse random maan joka eurossa ja palauttaa sen returnilla
 def maa_random():
-    maa = "select name from country where continent = 'EU' order by name;"
+    maa = "SELECT name FROM country WHERE continent = 'EU' ORDER BY name;"
     return
 
 # funktio joka valitsee random kaupungin maasta ja palauttaa sen returnilla
 def kaupunki_random():
-    kaupunki = "select municipality from airport;"
+    kaupunki = "SELECT municipality FROM airport ORDER BY RAND() LIMIT 1;"
     return
 
 # funktio joka valitsee random lentoaseman kaupungista, huom! jos lentoasema on yli 5
