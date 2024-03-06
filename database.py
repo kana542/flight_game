@@ -36,5 +36,7 @@ def lentoasema_koordinaatit():
 # funktio joka palauttaa kohteen tyypin (lentoasema tai heliport)
 def lentoasema_tyyppi():
     lento_tai_heli = "SELECT type FROM airport;"
+
 # funktio joka palauttaa lentoaseman koon, jos kyseessä on heliport, eli kokoa ei ole niin palautetaan False.
 def lentoasema_koko():
+    koko =
