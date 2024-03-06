@@ -9,7 +9,7 @@ def kaupunki_random():
 
 # funktio joka valitseee random lentoaseman kaupungista, huom! jos lentoasema on yli 5
 def lentoasema_random():
-moi
+    lentoasema_random_sql = "SELECT name FROM airport ORDER BY RAND() LIMIT 1;"
 # funktio joka hakee lentoaseman koordinaatit, muuttaa niitä vähintään 100m erisuuntiin ja palauttaa ne returnilla (gps muodossa)
 def lentoasema_koordinaatit():
 
