@@ -16,46 +16,48 @@ kohteen_koko = database.lentoasema_koko() # jos kyseessä lentoasema niin tallen
 
 maa_arvattu = False
 
-#Luodaan pelaajan kierrosajan mittaava funktiot
-
-# def pelin_kulku():
-#     # Kysy pelaajan nimeä
-#     pelaajan_nimi = input("Anna pelaajan nimi: ")
-#
-#     # Aloita kierros
-#     def aloita_kierros():
-#         return time.time()
-#
-#     def lopeta_kierros(alkuaika):
-#         loppuaika = time.time()
-#         return loppuaika - alkuaika
-#
-#     # Tallenna kierrosaika tietokantaan
-#     tallenna_aika('pelaajatiedot.db', pelaajan_nimi, kierrosaika)
-#
-#     print(f"Pelaajan {pelaajan_nimi} kierrosaika {kierrosaika} sekuntia tallennettu onnistuneesti.")
-
 #Funktio kierrosajasta ja pelaajan nimen kutsumisesta
-def tallenna_aika():
-    yhteys = mysql.connector.connect(
-        host='127.0.0.1',
-        port=3306,
-        database='flight_game',
-        user='root',
-        password='rootpass',
-        autocommit=True
-    )
+#HUOM! Täytyy selvitää Jonnen kanssa luodaanko kokonaan uusi taulu tietokantaan
+def tallenna_aika(yhteys, pelaajan_nimi, kierrosaika):
+    cursor = yhteys.cursor()
 
-def pelin_kulku():
+    # SQL-lauseen lisääminen
+    lisayslause = "INSERT INTO pelaajan_kierrosajat (pelaajan_nimi, kierrosaika) VALUES (%s, %s)"
+
+    # SQL-lauseen suorittaminen
+    cursor.execute(lisayslause, (pelaajan_nimi, kierrosaika))
+    yhteys.commit()
+    cursor.close()
+
+# Yhteys tietokantaan (muista korvata 'xxx' oikealla salasanallasi)
+yhteys = mysql.connector.connect(
+    host='127.0.0.1',
+    port=3306,
+    database='flight_game',
+    user='root',
+    password='xxx',  # Oikea salasana tähän
+    autocommit=True
+)
+
+def pelin_kulku(yhteys):
     pelaajan_nimi = input("Anna pelaajan nimi: ")
 
-    #Aloitetaan kierros
+    input("Paina Enter aloittaaksesi kierroksen...")
     alkuaika = time.time()
 
-    kierrrosaika = time.time() - alkuaika
+    input("Suorita tehtäväsi ja paina Enter lopettaaksesi kierroksen...")
+    loppuaika = time.time()
 
+    kierrosaika = loppuaika - alkuaika
 
+    tallenna_aika(yhteys, pelaajan_nimi, kierrosaika)
+    print(f"Pelaajan {pelaajan_nimi} kierrosaika {kierrosaika:.2f} sekuntia tallennettu onnistuneesti.")
 
+# Suorita pelin kulku
+pelin_kulku(yhteys)
+
+# Muista sulkea yhteys lopuksi
+yhteys.close()
 
 ################## STEP ONE ####################
 # ALKUNÄYTTÖ MISSÄ SELITETÄÄN PELAAJALLE HOMMAN NIMI
