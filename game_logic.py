@@ -16,6 +16,46 @@ kohteen_koko = database.lentoasema_koko() # jos kyseessä lentoasema niin tallen
 
 maa_arvattu = False
 
+#Luodaan pelaajan kierrosajan mittaava funktiot
+
+# def pelin_kulku():
+#     # Kysy pelaajan nimeä
+#     pelaajan_nimi = input("Anna pelaajan nimi: ")
+#
+#     # Aloita kierros
+#     def aloita_kierros():
+#         return time.time()
+#
+#     def lopeta_kierros(alkuaika):
+#         loppuaika = time.time()
+#         return loppuaika - alkuaika
+#
+#     # Tallenna kierrosaika tietokantaan
+#     tallenna_aika('pelaajatiedot.db', pelaajan_nimi, kierrosaika)
+#
+#     print(f"Pelaajan {pelaajan_nimi} kierrosaika {kierrosaika} sekuntia tallennettu onnistuneesti.")
+
+#Funktio kierrosajasta ja pelaajan nimen kutsumisesta
+def tallenna_aika():
+    yhteys = mysql.connector.connect(
+        host='127.0.0.1',
+        port=3306,
+        database='flight_game',
+        user='root',
+        password='rootpass',
+        autocommit=True
+    )
+
+def pelin_kulku():
+    pelaajan_nimi = input("Anna pelaajan nimi: ")
+
+    #Aloitetaan kierros
+    alkuaika = time.time()
+
+    kierrrosaika = time.time() - alkuaika
+
+
+
 
 ################## STEP ONE ####################
 # ALKUNÄYTTÖ MISSÄ SELITETÄÄN PELAAJALLE HOMMAN NIMI
