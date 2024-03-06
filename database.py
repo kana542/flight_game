@@ -23,5 +23,6 @@ def lentoasema_koko():
 
     if tulos == "heliport";
         return False
-
+    else:
+        return True
 
