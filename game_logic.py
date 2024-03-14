@@ -1,117 +1,80 @@
 import database
 import time
 import os
+import utils
 
-from openai import OpenAI
-
-################# MUUTTUJAT ####################
-
-oikea_maa = database.maa_random() # tallentaan arvottu maan nimi muuttujaan
-oikea_kaupunki = database.kaupunki_random() # tallentaan arvottu maan nimi muuttujaan
-oikea_lentoasema = database.lentoasema_random() # tallennetaan arvottu lentoaseman nimi muuttujaan
-koordinaatit = database.lentoasema_koordinaatit() # tallennetaan lentoaseman koordinaatit muuttujaan tuplena
-
-kohteen_tyyppi = database.lentoasema_tyyppi() # tallennetaan kohteen tyyppi (lentoasema vai heliport) muuttujaan
-kohteen_koko = database.lentoasema_koko() # jos kyseessä lentoasema niin tallennetaan kohteen koko muuttujaan
+# MUUTTUJAT
+oikea_maa, oikean_maan_iso = database.maa_random() # satunnainen maa ja sen iso-koodi (rajoitettu euroopan maihin)
+oikea_lentoasema = database.lentoasema_random(oikean_maan_iso) # satunnainen lentokenttä/helikopterialusta arvotusta maasta
+koordinaatti_lat, koordinaatti_lon = database.lentoasema_koordinaatit(oikea_lentoasema) # lentoaseman/helikopterialustan koordinaatit
+kohteen_tyyppi = database.lentoasema_tyyppi(oikea_lentoasema) # tallennetaan kohteen tyyppi (lentoasema vai heliport) muuttujaan
 
 maa_arvattu = False
 
-
-################## STEP ONE ####################
-# ALKUNÄYTTÖ MISSÄ SELITETÄÄN PELAAJALLE HOMMAN NIMI
-
+# Alkunäyttö pelaajalle missä kerrotaan pelin idea.
 def step_one():
+
     time.sleep(2)
-
-    print("""
-                                        |
-                                        |
-                                        |
-                                      .-'-.
-                                     ' ___ '
-                           ---------'  .-.  '---------
-           _________________________'  '-'  '_________________________
-            ''''''-|---|--/    \==][^',_m_,'^][==/    \--|---|-''''''
-                          \    /  ||/   H   \||  \    /
-                           '--'   OO   O|O   OO   '--'
-      
-                                  S K Y H A W K
-                                       v.1
-    """)
-
-    time.sleep(4)
     os.system('cls')
 
     print("""
-                               Tervetuloa skyhawk peliin!
+                                     Welcome to the Skyhawk game!
 
-    Tehtävänäsi on paikantaa varastettu lentokone/helikopteri satunnaiselta
-    sijainnista euroopassa. Sijainti on joko lentoasemalla tai helikopterialustalla.
-    Avaa valmiiksi selaimesta haluamasi karttaselain (suosittelemme google mapsia).
+    Your mission is to locate a stolen helicopter from a random airport or heliport across Europe. 
+         You need to use the browser map that you prefer to help you locate the helicopter. 
+                               We recommend Google Maps and OurAirports.
     """)
 
     time.sleep(12)
     os.system("cls")
 
 
-################## STEP TWO ####################
-# * TUOTETAAN PELAAJALLE 3KPL AVAINSANOJA OPENAI APIN AVULLA
-# * JOS PELAAJA ARVAA OIKEIN, LOOPPI MENEE BROKIE JA PELI JATKUU SEURAAVAAN VAIHEESEEN
-
-def step_two(oikea_maa):
-    print(f"Arvaa oikea maa seuraavista vihjeistä: {tuota_avainsanat(oikea_maa)}")
+# ANNETAAN PELAAJAN ARVATA SATUNNAISESTI VALITTU MAA OPENAI TUOTTAMILLA AVAINSANOILLA
+def step_two():
+    global maa_arvattu
+    print(f"First you need to guess the correct country where the helicopter might be.\nYour clues are following: {utils.tuota_avainsanat(oikea_maa)}")
     while True:
-        maa_arvaus = input("Vastaus: ")
+        maa_arvaus = input("Your answer: ")
         if maa_arvaus == oikea_maa:
-            print("Oikein!")
+            os.system("cls")
+            print("Correct!")
             maa_arvattu = True
+            time.sleep(2)
             break
+        else:
+            print("Wrong answer. Try again!")
 
-################## STEP THREE ####################
-# ANNETAAN PELAAJALLE VIIMEISET VIHJEET ELI KOHTEEN TYYPPI (LENTOASEMA TAI HELIPORT), KOKO JA KOORDINAATIT JOTKA HIEMAN HUMALASSA
-        
+# ANNETAAN PELAAJAN ARVATA LENTOKENTTÄ/HELIKOPTERIALUSTA KYSEISESTÄ MAASTA
 def step_three():
-    print("Noniin, siirrytään seuraavaan vaiheeseen!\nSeuraavaksi sinun pitää etsiä selaimella kartasta oikea lentoasema!")
-    print(f"Millainen kohde on kyseessä?: {kohteen_tyyppi}")
-    if kohteen_koko != False:
-        print(f"Kohteen koko: {kohteen_koko}")
-  
-    print(f"GPS-koordinaatit lähialueelta: {koordinaatit}")
+    time.sleep(2)
+    os.system("cls")
 
-################## STEP FOUR ####################
+    # tulostetaan kohteen tyyppi ja muutetaan alkuperäiset koordinaatit halutulla metrimäärällä vaihtelemaan
+    print(f"Type of the location: {kohteen_tyyppi}")
+    print(f"The coordinates are: {utils.gps_muutos(koordinaatti_lat, koordinaatti_lon, 1000)}")
 
-def step_four():
     while True:
-    
+        lentoasema_arvaus = input("Your answer: ")
+        arvaus = utils.tarkista_arvaus(lentoasema_arvaus, oikea_lentoasema)
+        
+        if arvaus == "ok":
+            os.system("cls")
+            print("Correct! You found the stolen helicopter!")
+            time.sleep(4)
+            os.system("cls")
+            time.sleep(1)
+            break
+        elif arvaus == "ei":
+            print("Wrong answer. Try again!")
+        else:
+            print("error")
 
-################ MUUT PASKAT ######################
+# TALLENNETAAN AIKA TIETOKANTAAN
+def tallenna_aika(pelaajan_nimi, kulunut_aika):
+    print(f"Your time was {kulunut_aika}!\n")
+    database.tallenna_aika(pelaajan_nimi, kulunut_aika)
 
-#funktio joka tuottaa 3kpl avainsanoja saadusta parametrista
-def tuota_avainsanat(maa):
-    client = OpenAI(api_key = "XXXXXXXXXXXXXXXXXXXX")
-    
-    completion = client.chat.completions.create(
-        model = "gpt-4-0125-preview",
-        messages = [{"role": "system", "content": f"Anna suomenkielellä 3 avainsanaa maasta: {maa}. Älä anna maan nimeä suoraan. Anna vastaukset samalla rivillä ja erottele ne pilkulla, älä lisää mitään muuta vastaukseen."}]
-    )
-
-    temp_avainsanat = completion.choices[0].message.content.strip()
-    #muutetaan saadut avainsanat listaksi
-    avainsanat = [avainsana.strip() for avainsana in temp_avainsanat.split(",")]
-
-    return avainsanat
-
-# funktio joka tarkistaa onko satunnaisesti tuotettu lentoasema google mapsissa 
-def tarkista_lentoasema():
-    client = OpenAI(api_key = "XXXXXXXXXXXXXXXXXXXX")
-    
-    completion = client.chat.completions.create(
-        model = "gpt-4-0125-preview",
-        messages = [{"role": "system", "content": f"Tarkista seuraava lentoasema/helikopterialusta, löytyykö se google mapsista. Vastaa vain 1 jos löytyy ja 0 jos ei löydy."}]
-    )
-
-    temp_avainsanat = completion.choices[0].message.content.strip()
-    #muutetaan saadut avainsanat listaksi
-    avainsanat = [avainsana.strip() for avainsana in temp_avainsanat.split(",")]
-
-    return avainsanat
+# HAETAAN KUTSUTAAN FUNKTIO JOKA HAKEE SCOREBOARDING TIETOKANNASTA
+def scoreboard():
+    print("Scoreboard (top 5 players):\n")
+    database.tulosta_pelaajat()
