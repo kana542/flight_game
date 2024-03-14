@@ -1,20 +1,45 @@
-# funktio joka yhdistää sql-tietokantaan.
-def connection():
+import mysql.connector
+from mysql.connector import Error
 
-# funktio joka valitse random maan joka eurossa ja palauttaa sen returnilla
+def uusi_yhteys():
+    try:
+        connection = mysql.connector.connect(
+            host='127.0.0.1',
+            port=3306,
+            database='flight_game',
+            user='root',
+            password='apple13'
+        )
+        return connection
+    except Error as er:
+        print(f"Virhe: {er}")
+        return None
+
+def sql_suoritus(sql, params=None):
+    try:
+        yhteys = uusi_yhteys()
+        if yhteys is not None:
+            with yhteys:
+                with yhteys.cursor() as kursori:
+                    kursori.execute(sql, params)
+                    tulos = kursori.fetchone()
+                    return tulos
+    except Error as er:
+        print(f"Virhe: {er}")
+        return None
+
 def maa_random():
+    sql = "SELECT name, iso_country FROM country WHERE continent = %s ORDER BY RAND() LIMIT 1"
+    return sql_suoritus(sql, ('EU',))
 
-# funktio joka valitsee random kaupungin maasta ja palauttaa sen returnilla
-def kaupunki_random():
+def lentoasema_random(i):
+    sql = "SELECT name FROM airport WHERE iso_country = %s AND type != 'closed' ORDER BY RAND() LIMIT 1"
+    return sql_suoritus(sql, (i,))[0]
 
-# funktio joka valitseee random lentoaseman kaupungista, huom! jos lentoasema on yli 5
-def lentoasema_random():
+def lentoasema_koordinaatit(n):
+    sql = "SELECT latitude_deg, longitude_deg FROM airport WHERE name = %s"
+    return sql_suoritus(sql, (n,))
 
-# funktio joka hakee lentoaseman koordinaatit, muuttaa niitä vähintään 100m erisuuntiin ja palauttaa ne returnilla (gps muodossa)
-def lentoasema_koordinaatit():
-
-# funktio joka palauttaa kohteen tyypin (lentoasema tai heliport)
-def lentoasema_tyyppi():
-
-# funktio joka palauttaa lentoaseman koon, jos kyseessä on heliport, eli kokoa ei ole niin palautetaan False.
-def lentoasema_koko():
+def lentoasema_tyyppi(n):
+    sql = "SELECT type FROM airport WHERE name = %s"
+    return sql_suoritus(sql, (n,))[0]

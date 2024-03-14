@@ -1,23 +1,17 @@
 import database
 import time
 import os
-
 from openai import OpenAI
+from geopy.distance import geodesic
+import random
+import math
 
-################# MUUTTUJAT ####################
-
-oikea_maa = database.maa_random() # tallentaan arvottu maan nimi muuttujaan
-oikea_kaupunki = database.kaupunki_random() # tallentaan arvottu maan nimi muuttujaan
-oikea_lentoasema = database.lentoasema_random() # tallennetaan arvottu lentoaseman nimi muuttujaan
-koordinaatit = database.lentoasema_koordinaatit() # tallennetaan lentoaseman koordinaatit muuttujaan tuplena
-
-kohteen_tyyppi = database.lentoasema_tyyppi() # tallennetaan kohteen tyyppi (lentoasema vai heliport) muuttujaan
-kohteen_koko = database.lentoasema_koko() # jos kyseessä lentoasema niin tallennetaan kohteen koko muuttujaan
+oikea_maa, oikean_maan_iso = database.maa_random() # satunnainen maa ja sen iso-koodi (rajoitettu euroopan maihin)
+oikea_lentoasema = database.lentoasema_random(oikean_maan_iso) # satunnainen lentokenttä/helikopterialusta arvotusta maasta
+koordinaatti_lat, koordinaatti_lon = database.lentoasema_koordinaatit(oikea_lentoasema) # lentoaseman/helikopterialustan koordinaatit
+kohteen_tyyppi = database.lentoasema_tyyppi(oikea_lentoasema) # tallennetaan kohteen tyyppi (lentoasema vai heliport) muuttujaan
 
 maa_arvattu = False
-
-################## STEP ONE ####################
-# ALKUNÄYTTÖ MISSÄ SELITETÄÄN PELAAJALLE HOMMAN NIMI
 
 def step_one():
     time.sleep(2)
@@ -42,83 +36,75 @@ def step_one():
     os.system('cls')
 
     print("""
-                               Tervetuloa skyhawk peliin!
+                               Welcome to the Skyhawk game!
 
-    Tehtävänäsi on paikantaa varastettu lentokone/helikopteri satunnaiselta
-    sijainnista euroopassa. Sijainti on joko lentoasemalla tai helikopterialustalla.
-    Avaa valmiiksi selaimesta haluamasi karttaselain (suosittelemme google mapsia).
+    Your mission is to locate a stolen helicopter from a random airport or heliport across Europe. 
+         You need to use the browser map that you prefer to help you locate the helicopter. 
+                        We recommend Google Maps and OurAirports.
     """)
 
     time.sleep(12)
     os.system("cls")
 
-
-################## STEP TWO ####################
-# * TUOTETAAN PELAAJALLE 3KPL AVAINSANOJA OPENAI APIN AVULLA
-# * JOS PELAAJA ARVAA OIKEIN, LOOPPI MENEE BROKIE JA PELI JATKUU SEURAAVAAN VAIHEESEEN
-
-def step_two(oikea_maa):
-    print(f"Arvaa oikea maa seuraavista vihjeistä: {tuota_avainsanat(oikea_maa)}")
+def step_two():
+    global maa_arvattu
+    print(f"First you need to guess the correct country where the helicopter might be.\nYour clues are following: {tuota_avainsanat(oikea_maa)}")
     while True:
-        maa_arvaus = input("Vastaus: ")
+        maa_arvaus = input("Your answer: ")
         if maa_arvaus == oikea_maa:
-            print("Oikein!")
+            print("Correct!")
             maa_arvattu = True
             break
-
-################## STEP THREE ####################
-# ANNETAAN PELAAJALLE VIIMEISET VIHJEET ELI KOHTEEN TYYPPI (LENTOASEMA TAI HELIPORT), KOKO JA KOORDINAATIT JOTKA HIEMAN HUMALASSA
-        
-def step_three():
-    print("Noniin, siirrytään seuraavaan vaiheeseen!\nSeuraavaksi sinun pitää etsiä selaimella kartasta oikea lentoasema!")
-    print(f"Millainen kohde on kyseessä?: {kohteen_tyyppi}")
-    if kohteen_koko != False:
-        print(f"Kohteen koko: {kohteen_koko}")
-  
-    print(f"GPS-koordinaatit lähialueelta: {koordinaatit}")
-
-################## STEP FOUR ####################
-
-def step_four():
-    while True:
-        if tarkista_lentoasema(oikea_lentoasema) != "ok":
-            oikea_lentoasema = database.lentoasema_random()
         else:
-            while True:
-                lentoasema_arvaus = input("Anna vihdoin oikea lentoasema: ")
-                if lentoasema_arvaus == oikea_lentoasema:
-                    print("Oikein! Voitit pelin!")
-                    break
-        break
+            print("Wrong answer. Try again!")
 
-################ MUUT PASKAT ######################
+def step_three():
+    print(f"Type of the location: {kohteen_tyyppi}")
+    print(f"The coordinates are: {gps_muutos(koordinaatti_lat, koordinaatti_lon, 100)}")
 
-#funktio joka tuottaa 3kpl avainsanoja saadusta parametrista
+    while True:
+        lentoasema_arvaus = input("Your answer: ")
+        arvaus = tarkista_arvaus(lentoasema_arvaus, oikea_lentoasema)
+        
+        if arvaus == "ok":
+            print("Correct! You win the game!")
+            break
+        elif arvaus == "ei":
+            print("Wrong answer. Try again!")
+        else:
+            print("error")
+
 def tuota_avainsanat(maa):
-    client = OpenAI(api_key = "XXXXXXXXXXXXXXXXXXXX")
+    client = OpenAI(api_key = "xxxxx")
     
     completion = client.chat.completions.create(
         model = "gpt-4-0125-preview",
-        messages = [{"role": "system", "content": f"Anna suomenkielellä 3 avainsanaa maasta: {maa}. Älä anna maan nimeä suoraan. Anna vastaukset samalla rivillä ja erottele ne pilkulla, älä lisää mitään muuta vastaukseen."}]
+        messages = [{"role": "system", "content": f"Anna englannin kielellä 3 avainsanaa maasta: {maa}. ÄLÄ ANNA KOSKAAN MAAN NIMEÄ SUORAAN. Anna vastaukset samalla rivillÃ¤ ja erottele ne pilkulla, älä lisää mitään muuta vastaukseen."}]
     )
 
-    temp_avainsanat = completion.choices[0].message.content.strip()
-    #muutetaan saadut avainsanat listaksi
-    avainsanat = [avainsana.strip() for avainsana in temp_avainsanat.split(",")]
+    avainsanat = completion.choices[0].message.content.strip()
 
     return avainsanat
 
-# funktio joka tarkistaa onko satunnaisesti tuotettu lentoasema google mapsissa 
-def tarkista_lentoasema(lentoasema):
-    client = OpenAI(api_key = "XXXXXXXXXXXXXXXXXXXX")
+def tarkista_arvaus(arvaus, oikea_lentoasema):
+    client = OpenAI(api_key = "xxxxx")
     
     completion = client.chat.completions.create(
         model = "gpt-4-0125-preview",
-        messages = [{"role": "system", "content": f"Tarkista seuraava lentoasema/helikopterialusta: {lentoasema}, löytyykö se google mapsista. Vastaa vain ok jos löytyy ja ei jos ei löydy."}]
+        messages = [{"role": "system", "content": f"Tarkista vastaako kohde {arvaus}, kohdetta {oikea_lentoasema}. Huom! Jos annettu kohde on kuitenkin oikea, mutta vain eri nimellä tai se muistuttaa vastausta, sen silloin oikein. Tarkista tämä kaksi kertaa että olet todella varma vastauksesta. Jos kohde vastaa, palauta 'ok', jos ei vastaa, palauta 'ei'. Älä palauta mitään muuta."}]
     )
 
-    temp_avainsanat = completion.choices[0].message.content.strip()
-    #muutetaan saadut avainsanat listaksi
-    vastaus = [avainsana.strip() for avainsana in temp_avainsanat.split(",")]
+    vastaus = completion.choices[0].message.content.strip()
 
     return vastaus
+
+def gps_muutos(lat, lon, etäisyys):
+
+    alkuperäinen_paikka = lat, lon
+
+    etäisyys_km = etäisyys / 1000
+    kulma = random.uniform(0, 2 * math.pi)
+
+    uudet_koordinaatit = geodesic(kilometers = etäisyys_km).destination(alkuperäinen_paikka, bearing=math.degrees(kulma))
+
+    return f"{uudet_koordinaatit.latitude}, {uudet_koordinaatit.longitude}"
