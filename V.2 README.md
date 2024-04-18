@@ -8,8 +8,8 @@ Uudenlainen vihje systeemi V.2:een. Tarkoituksena on implimentoida kuva vihjeit�
 Riippuen kuinka nopeaa itse kuvien generointi on voimme käyttää sitä suoraan. Jos generoiminen on liian hidasta, meillä on mahdollisuus käyttää kuvatekstuuri tekniikkaa, jolla me liitetään kuvat yhteen isoksi tekstuuriksi ja otamme koordinaatteja eri kohdista tekstuurista, joka lopputuloksena näyttää meille halutun kuvan. Projektissa toin puheeksi databasen käytön puhelussa, mutta päädyttiin lopputulokseen, ettei sitä kannattaisi tehdä verrannollisen työmäärän ja ajan käytön suhteen
 
 
+
 ############### Jonne ###############
-############# 18.04.2024 ############
 
 Skyhawk 2.0 keskittyy tuomaan visuaalisemman pelielämyksen selaimessa.
 
