@@ -1,5 +1,5 @@
-V.2
-
+![image](https://github.com/kana542/flight_game/assets/156772428/19d7b82b-6d92-43af-ae81-ea2617a6a1bd)V.2
+######Jonathan#############
 Uudet mahdolliset ideat:
 
 Kuvien implementointi
@@ -26,3 +26,18 @@ Tutoriaali
 Pelissä siis arvotaan sql tietokannasta saatujen lentoaseman gps-koordinaattien avulla google street view näkymä, missä pelaaja voi liikkua eri suuntiin yrittäen arvata missä lentoasema sijaitsee. Vieressä on erillinen ikkuna missä on google maps kartta näkymä mihin pelaaja laittaa arvauksensa. Kun arvaus vahvistetaan, pelaaja saa pisteitä riippuen kuinka lähelle hänen arvauksensa osui. Kierroksia per peli on 5 ja jokaisesta kierroksesta on mahdollista saada max 1000 pistettä. Kun kierrokset ovat ohi, näkyy scoreboard missä on kirjautuneiden pelaajien high scoret (pelaajat, jotka eivät kirjaudu, eivät päädy listalle/scoreboardille).
 
 Peli hyödyntää seuraavia rajapintoja: Google maps api, google street view api
+
+
+
+######Joel#######
+
+- Google earth jos streetview ei toimi
+- Streetviewissa ei ole mahdollista liikkua kaikissa maisssa esim. Serbiassa tai Belarus
+- Piirretty kuvavihje tulisi ensimmäiseksi ennen tekstivihjeitä   
+- Piirretty kuva olisi esim. historialliset, monumentit, landmarkit tai kirjallisuuteen viittaavat.
+  
+Creative Common licenses RawPixelistä:
+Spain:
+https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvcGQ0My0wNjA0LTAzNC1uYW1fMS5qcGc.jpg
+Paris:
+https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvam9iNjY2LTE1Ni1sMTA4NW0wMS5qcGc.jpg
