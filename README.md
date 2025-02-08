@@ -1,1 +1,3 @@
-vanha ryhmä projekti, eka versio
+vanha ryhmä projekti
+eka versio
+api avaimet kuoletettu
